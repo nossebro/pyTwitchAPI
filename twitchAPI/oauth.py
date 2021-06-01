@@ -45,9 +45,11 @@ from typing import List, Union
 import webbrowser
 from aiohttp import web
 import asyncio
+import threading
 from threading import Thread
 from time import sleep
 from os import path
+import sys
 import requests
 from concurrent.futures._base import CancelledError
 from logging import getLogger, Logger
@@ -185,8 +187,12 @@ class UserAuthenticator:
                 await asyncio.sleep(1)
             except (CancelledError, asyncio.CancelledError):
                 pass
-        for task in asyncio.all_tasks(self.__loop):
-            task.cancel()
+        if sys.version_info == (3, 6):
+            enum = asyncio.Task.all_tasks(self.__loop)
+        else:
+            enum = asyncio.all_tasks(self.__loop)
+        for task in enum:
+            task.cancel()            
 
     def __run(self, runner: 'web.AppRunner'):
         self.__runner = runner
