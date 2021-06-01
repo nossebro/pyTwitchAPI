@@ -187,10 +187,10 @@ class UserAuthenticator:
                 await asyncio.sleep(1)
             except (CancelledError, asyncio.CancelledError):
                 pass
-        if sys.version_info == (3, 6):
-            enum = asyncio.Task.all_tasks(self.__loop)
-        else:
+        if sys.version_info >= (3, 7):
             enum = asyncio.all_tasks(self.__loop)
+        else:
+            enum = asyncio.Task.all_tasks(self.__loop)
         for task in enum:
             task.cancel()            
 
